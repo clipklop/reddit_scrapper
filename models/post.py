@@ -4,16 +4,15 @@ from dataclasses import dataclass, field
 
 @dataclass
 class Post:
-    id: str
-    name: str
-    display_name: str
+    id: str # fullname
+    title: str
     author: str
-    score: str
+    score: int
+    upvote: int
+    upvote_ratio: float # The percentage of upvotes from all votes on the submission.
     created_utc: datetime.datetime
-    description: str
 
 
 @dataclass
 class PostCollection:
-    collection: list[Post]
-    
+    p_list: list[Post] = field(default_factory=list)
