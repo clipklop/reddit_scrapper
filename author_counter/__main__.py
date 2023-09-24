@@ -5,7 +5,9 @@ from prawcore.exceptions import ResponseException
 
 from models.subreddit import Subreddit
 
-from .api_scrapper import get_subreddit_posts, get_top_posts, get_top_comments
+from api_scrapper.api_scrapper import get_subreddit_posts, get_top_posts, get_top_comments
+
+from .author_counter import author_counter
 
 
 def main() -> None:
@@ -13,14 +15,17 @@ def main() -> None:
     subreddit_posts = get_subreddit_posts(reddit, Subreddit.ALL.value)
 
     try:
-        print("Top posts:")
+        print('- Top posts users')
         top_posts = get_top_posts(posts=subreddit_posts)
-        pprint(top_posts)
-        
-        print("Top comments:")
+        pprint(author_counter(top_posts).most_common(5))
+
+        print('---')
+
+        print('- Top comments users')
         subreddit_posts = get_subreddit_posts(reddit, Subreddit.ALL.value)
         top_comments = get_top_comments(posts=subreddit_posts)
-        pprint(top_comments)
+        pprint(author_counter(top_comments).most_common(5))
+
     except ResponseException as e:
         print(e)
 

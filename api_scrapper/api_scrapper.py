@@ -1,43 +1,65 @@
-#
-
-import os
-import json
+from datetime import datetime
+from dataclasses import asdict
+from collections import Counter
 
 import praw
+from praw.models import ListingGenerator, MoreComments
 
-from models.post import Post
-
-# def show_request_urls():
-#     # driver.get(target_url)
-#     # return [{"url": r.url} for r in driver.requests]0
-#     reddit = praw.Reddit("bot", user_agent="bot2 user agent")
-#     print(reddit)
+from models.post import Post, PostCollection
+from models.comment import Comment, CommentCollection
 
 
-def get_top_posts(reddit: praw.Reddit) -> None:
-    # top_posts = reddit.subreddit("all").top(limit=10)
-    top_posts = reddit.subreddit("learnpython").top(limit=10)
-
-    for post in top_posts:
-        print(post.num_comments)
+def get_subreddit_posts(reddit_client: praw.Reddit, subreddit_name: str) -> ListingGenerator:
+        return reddit_client.subreddit(subreddit_name).top(time_filter='week', limit=10)
 
 
-def get_top_comments(reddit: praw.Reddit) -> None:
-    post = next(reddit.subreddit("all").top(limit=1))
-    top_comments = post.comments.list()[:5]
-    
-    for comment in top_comments:
-        print(comment.body)
+def get_top_posts(posts: ListingGenerator) -> PostCollection:
+    post_collection = PostCollection()
+
+    for p in posts:
+        post = Post(
+            id = p.fullname,
+            title = p.title,
+            author = 'Deleted user' if not p.author else p.author.name,
+            score = p.score,
+            upvote = p.ups,
+            upvote_ratio = p.upvote_ratio,
+            created_utc = datetime.utcfromtimestamp(p.created_utc),
+        )
+        post_collection.p_list.append(post)
+
+    return post_collection.p_list
 
 
-def main() -> None:
-    reddit = praw.Reddit("bot")
+def get_top_comments(posts: ListingGenerator) -> CommentCollection:
+    comments_collection = CommentCollection()
 
-    print(Post)
-    # get_top_posts(reddit)
-    # get_top_comments(reddit)
-    # print(reddit)
+    for post in posts:
+        for c in post.comments:
+            if isinstance(c, MoreComments):
+                continue
+            comment = Comment(
+                id = c.id,
+                body = c.body,
+                author = 'Deleted user' if not c.author else c.author.name,
+                score = c.score,
+                submission = c.submission,
+                subreddit = c.subreddit,
+                created_utc = datetime.utcfromtimestamp(c.created_utc),
+            )
+            comments_collection.c_list.append(comment)
+
+    return comments_collection.c_list
 
 
-# if __name__ == '__main__':
-#     main()
+def author_counter(reddit_collections: PostCollection | CommentCollection) -> Counter:
+    counter = Counter()
+
+    for collection in reddit_collections:
+        collection = asdict(collection)
+        if collection['author'] in counter:
+            counter[collection['author']] += 1
+        else:
+            counter[collection['author']] = 1
+
+    return counter
