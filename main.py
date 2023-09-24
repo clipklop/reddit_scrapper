@@ -56,21 +56,28 @@ def post_author_counter(post_collection: PostCollection) -> Counter[str]:
 
 
 def get_top_comments(reddit: praw.Reddit) -> None:
-    post = next(reddit.subreddit("all").top(limit=1))
-    top_comments = post.comments.list()[:5]
-    
+    # post = next(reddit.subreddit("all").top(limit=1))
+
+    top_post = reddit.subreddit("all").top(limit=1)
+    top_comments = [i.comments for i in top_post]
+
     for comment in top_comments:
+        if isinstance(comment, praw.models.MoreComments):
+            continue
         print(comment.body)
+
+    # for comment in top_comments:
+    #     print(comment.body)
 
 
 def main() -> None:
     
     reddit = praw.Reddit("bot")
     
-    post = get_top_posts(reddit_client=reddit, subreddit_name=Subreddit.ALL.value)
-    print(post_author_counter(post).most_common())
+    # post = get_top_posts(reddit_client=reddit, subreddit_name=Subreddit.ALL.value)
+    # print(post_author_counter(post).most_common())
 
-    # get_top_comments(reddit)
+    get_top_comments(reddit)
     # print(reddit)
 
 
