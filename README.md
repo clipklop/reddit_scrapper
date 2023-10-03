@@ -16,7 +16,7 @@
 - Enter your Reddit API's credentianls into **praw.ini**
 - To run **API Scrapper** module, use this command in the project root directory:
         
-        python -m api_scrapper
+        python -m scrapper
 - To run **Author Counter** module, use this command in the project root directory:
         
         python -m author_counter
