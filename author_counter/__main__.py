@@ -5,9 +5,9 @@ from prawcore.exceptions import ResponseException
 
 from models.subreddit import Subreddit
 
-from api_scrapper.api_scrapper import get_subreddit_posts, get_top_posts, get_top_comments
+from scrapper.api import get_subreddit_posts, get_top_posts, get_top_comments
 
-from .author_counter import author_counter
+from author_counter.author_counter import author_counter
 
 
 def main() -> None:

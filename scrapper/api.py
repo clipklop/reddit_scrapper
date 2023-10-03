@@ -1,6 +1,4 @@
 from datetime import datetime
-from dataclasses import asdict
-from collections import Counter
 
 import praw
 from praw.models import ListingGenerator, MoreComments
@@ -50,16 +48,3 @@ def get_top_comments(posts: ListingGenerator) -> CommentCollection:
             comments_collection.c_list.append(comment)
 
     return comments_collection.c_list
-
-
-def author_counter(reddit_collections: PostCollection | CommentCollection) -> Counter:
-    counter = Counter()
-
-    for collection in reddit_collections:
-        collection = asdict(collection)
-        if collection['author'] in counter:
-            counter[collection['author']] += 1
-        else:
-            counter[collection['author']] = 1
-
-    return counter
